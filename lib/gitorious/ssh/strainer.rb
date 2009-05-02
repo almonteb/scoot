@@ -33,7 +33,7 @@ module Gitorious
     
       COMMANDS_READONLY = [ 'git-upload-pack' ]
       COMMANDS_WRITE    = [ 'git-receive-pack' ]
-      ALLOW_RE = /^'([a-z0-9][a-z0-9@._\-]*(\/[a-z0-9][a-z0-9@\._\-]*)*\.git)'$/i.freeze
+      ALLOW_RE = /^'.*?([a-z0-9][a-z0-9@._\-]*(\/[a-z0-9][a-z0-9@\._\-]*)*\.git)'$/i.freeze
     
       def initialize(command)
         @command = command
@@ -41,6 +41,7 @@ module Gitorious
         @argument = nil
         @path = nil
       end
+      
       attr_reader :path, :verb, :command
     
       def full_path
@@ -61,9 +62,9 @@ module Gitorious
         if !(COMMANDS_WRITE.include?(@verb)) && !(COMMANDS_READONLY.include?(@verb))
           raise BadCommandError
         end
-      
         if ALLOW_RE =~ @argument
-          @path = $1
+          $stderr.puts "Calcu"
+          @path = "/#{$1}"
           raise BadCommandError unless @path
         else
           raise BadCommandError

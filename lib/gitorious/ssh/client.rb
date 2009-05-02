@@ -24,9 +24,13 @@ module Gitorious
     class Client
       def initialize(strainer, username)
         @strainer = strainer
-        @project_name, @repository_name = strainer.path.split("/")
+        $stderr.puts "Dnsadfdsf"
+        parts_of_path = strainer.path.split("/")
+        @repository_name, @project_name, @user_name = [parts_of_path.last, parts_of_path.last.gsub(".git", ""), parts_of_path[-2]]
+        $stderr.puts @repository_name
+        $stderr.puts @project_name
+        $stderr.puts @user_name
         @repository_name.gsub!(/\.git$/, "")
-        @user_name = username
       end
       attr_accessor :project_name, :repository_name, :user_name
     
@@ -42,7 +46,7 @@ module Gitorious
     
       def query_url
         url = ["/projects"]
-        url << @project_name
+        url << @repository_name
         url << "repos"
         url << @repository_name
         url << "writable_by?username=#{@user_name}"
@@ -50,7 +54,7 @@ module Gitorious
       end
     
       def to_git_shell_argument
-        "#{@strainer.verb} '#{@strainer.full_path}'"
+        "#{@strainer.verb} '#{@strainer.path}'"
       end
     
       protected

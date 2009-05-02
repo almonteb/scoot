@@ -11,6 +11,7 @@ else
   conf_file = File.join(BASE_DIR, "config/gitorious.yml")
 end
 
+$DEBUG = true
 GitoriousConfig = YAML.load_file(conf_file)
 
 ENV["PATH"] = "/usr/local/bin/:/opt/local/bin:#{ENV["PATH"]}"
@@ -21,6 +22,7 @@ require "client"
 
 File.umask(0022)
 original_command = ENV["SSH_ORIGINAL_COMMAND"]
+
 user = ARGV[0]
 
 logger = Logger.new(File.join(BASE_DIR, "log", "gitorious_auth.log"))
@@ -41,27 +43,37 @@ if user.nil? || user.strip.empty?
   exit!(1)
 end
 
+if match = /git-receive-pack '(.*?)'/.match(original_command)
+  original_command = "git-receive-pack '#{GitoriousConfig['repository_base_path']}/#{match[1]}'"
+end
+
+$stderr.puts original_command
+
+
 begin
   strainer = Gitorious::SSH::Strainer.new(original_command).parse!
   client = Gitorious::SSH::Client.new(strainer, user)
-
+  $stderr.puts "THIS IS SPARTA" 
+  $stderr.puts ENV['PATH']
+  $stderr.puts `whoami`
   # The meat of it all; do the permission check
   # replace process with git-shell if everything is fine
   if client.assure_user_can_write!
     args = client.to_git_shell_argument
     $stderr.puts "git-shell -c #{args.inspect}" if $DEBUG
-    exec("git-shell", "-c", args)
+    system("git-shell -c \"#{args}\"")
   end
   
   unless $?.success?
     $stderr.puts "Failed to execute git command"
     exit!(1)
   end
+  
 rescue Gitorious::SSH::AccessDeniedError => e
   $stderr.puts "Access denied or bad repository path"
   exit!(1)
 rescue Gitorious::SSH::BadCommandError => e
-  $stderr.puts "Access denied or bad command"
+  $stderr.puts "Access denied or bad command #{e.inspect}"
   exit!(1)
 rescue Object => e
   if $DEBUG

@@ -2,6 +2,8 @@
 
 incpath = File.dirname(__FILE__)
 $: << incpath
+$: << "/Library/Ruby/Site/1.8"
+$: << "/Library/Ruby/Gems/1.8/gems/rails-2.3.2"
 
 require 'rails_env'
 require 'date'

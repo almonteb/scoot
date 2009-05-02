@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'daemons'
-require 'geoip'
 require 'socket'
 require 'fcntl'
 require "optparse"

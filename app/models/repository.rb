@@ -84,7 +84,7 @@ class Repository < ActiveRecord::Base
   end
   
   def gitdir
-    File.join(project.slug, "#{name}.git")
+    File.join(project.user.login.downcase, "#{name}.git")
   end
   
   def clone_url
