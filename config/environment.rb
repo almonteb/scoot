@@ -43,7 +43,7 @@ Rails::Initializer.run do |config|
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
   # config.log_level = :debug
-
+  config.action_controller.session = { :key => "_gitorious", :secret => "honestlynevereveiwdsfhjdflijsdbflijdfsbdfsgljbdfgsljbdfgsrshowthistoanyoneevenyourmum" }
   # Make Time.zone default to the specified zone, and make Active Record store time values
   # in the database in UTC, and return them converted to the specified local zone.
   # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
@@ -53,15 +53,6 @@ Rails::Initializer.run do |config|
   # All files from config/locales/*.rb,yml are added automatically.
   # config.i18n.load_path << Dir[File.join(RAILS_ROOT, 'my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
-
-  # Your secret key for verifying cookie session data integrity.
-  # If you change this key, all old sessions will become invalid!
-  # Make sure the secret is at least 30 characters and all random, 
-  # no regular words or you'll be exposed to dictionary attacks.
-  config.action_controller.session = {
-    :session_key => '_ks1_session_id', 
-    :secret => ''
-  }
 
   # Use the database for sessions instead of the cookie-based default,
   # which shouldn't be used to store highly confidential information
