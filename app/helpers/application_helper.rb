@@ -272,6 +272,10 @@ module ApplicationHelper
     !@content_for_sidebar.blank?
   end
   
+  def markdown(text)
+    textilize(text)
+  end
+  
   def render_readme(repository)
     possibilities = []
     repository.git.git.ls_tree({:name_only => true}, "master").each do |line|

@@ -31,6 +31,7 @@
 <% content_for :submenu do -%>
   <% if @project.admin?(current_user) -%>
     <li><%= link_to t("views.projects.settings"), edit_project_path(@project) -%></li>
+    <li><%= link_to t("views.projects.delete"), confirm_delete_project_path(@project) -%></li>
   <% end -%>  
 <% end -%>
 

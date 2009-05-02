@@ -165,7 +165,7 @@ class Repository < ActiveRecord::Base
   
   def create_delete_repos_task
     Task.create!(:target_class => self.class.name, 
-      :command => "delete_git_repository", :arguments => [gitdir])
+      :command => "delete_git_repository", :arguments => [gitdir]).perform!
   end
   
   def total_commit_count

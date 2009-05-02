@@ -22,12 +22,6 @@ class MergeRequest < ActiveRecord::Base
   belongs_to :target_repository, :class_name => 'Repository'
   has_many   :events, :as => :target, :dependent => :destroy
   
-  is_indexed :fields => ["proposal"], :include => [{
-      :association_name => "user",
-      :field => "login",
-      :as => "proposed_by"
-    }], :conditions => "status = 0"
-  
   attr_protected :user_id, :status
     
   validates_presence_of :user, :source_repository, :target_repository

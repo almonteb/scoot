@@ -35,21 +35,6 @@ class Project < ActiveRecord::Base
   has_many    :events, :order => "created_at asc", :dependent => :destroy
   has_one     :wiki_repository, :class_name => "Repository", 
     :conditions => ["kind = ?", Repository::KIND_WIKI]
-  
-  is_indexed :fields => ["title", "description", "slug"], 
-    :concatenate => [
-      { :class_name => 'Tag',
-        :field => 'name',
-        :as => 'category',
-        :association_sql => "LEFT OUTER JOIN taggings ON taggings.taggable_id = projects.id " +
-                            "AND taggings.taggable_type = 'Project' LEFT OUTER JOIN tags ON taggings.tag_id = tags.id"
-      }],
-    :include => [{
-      :association_name => "user",
-      :field => "login",
-      :as => "user"
-    }]
-
 
   URL_FORMAT_RE = /^(http|https|nntp):\/\//.freeze
   validates_presence_of :title, :user_id, :slug, :description
@@ -167,7 +152,7 @@ class Project < ActiveRecord::Base
 
   protected
     def create_mainline_repository
-      self.repositories.create!(:user => self.user, :name => "mainline")
+      self.repositories.create!(:user => self.user, :name => title)
     end
     
     def create_wiki_repository
