@@ -11,6 +11,7 @@ RAILS_GEM_VERSION = '2.0.1' unless defined? RAILS_GEM_VERSION
 require File.join(File.dirname(__FILE__), 'boot')
 
 Rails::Initializer.run do |config|
+  config.active_record.allow_concurrency=true
   # Settings in config/environments/* take precedence over those specified here
 
   # Skip frameworks you're not going to use (only works if using vendor/rails)
@@ -43,13 +44,6 @@ Rails::Initializer.run do |config|
   # This is necessary if your schema can't be completely dumped by the schema dumper,
   # like if you have constraints or database-specific column types
   # config.active_record.schema_format = :sql
-
-  # Activate observers that should always be running
-  config.active_record.observers = [
-      :user_observer, 
-      :repository_observer, 
-      :merge_request_observer
-  ]
 
   # Make Active Record use UTC-base instead of local time
   config.active_record.default_timezone = :utc

@@ -5,6 +5,42 @@
   <%= auto_link(markdown(sanitize(@project.description)), :urls) -%>
 </div>
 
+<% if @project.just_created? && @project.user == current_user %>
+  <div id='just_created_tips'>
+    <h3>Global setup</h3>
+    <pre>
+      Download and install Git
+      git config --global user.name "<%= @project.user.login %>"
+      git config --global user.email <%= @project.user.email %>
+    </pre>
+
+    <h3>New Git Repo?</h3>
+      <pre>
+        mkdir <%=h @project.title %>
+        cd <%=h @project.title %>
+        git init
+        touch README
+        git add README
+        git commit -m 'first commit'
+        git remote add origin <%=h @project.mainline_repository.push_url %>
+        git push origin master
+      </pre>
+
+    <h3>Existing Git Repo?</h3>
+      <pre>
+        cd existing_git_repo
+        git remote add origin <%=h @project.mainline_repository.push_url %>
+        git push origin master
+      </pre>
+
+    Importing a SVN Repo?
+      Click here
+
+    When you're done:
+      Continue
+  </div>
+<% end %>
+
 <h2>Activities<%= feed_icon @atom_auto_discovery_url %></h2>
 <%= render :partial => "events/events", :locals => { :events => @events } -%>
 
@@ -44,7 +80,6 @@
         <strong><%= link_to h(@mainline_repository.name), [@project, @mainline_repository] -%></strong>
       </div>
       <div class="user">
-        <%= gravatar(@mainline_repository.user.email, :size => 16, :style => "tiny") %>
         <%= link_to h(@mainline_repository.user.login), @mainline_repository.user -%>
       </div>
     </li>
@@ -55,7 +90,6 @@
             <%= link_to h(repos.name), [@project, repos] -%>
           </div>
           <div class="user">
-            <%= gravatar(repos.user.email, :size => 16, :style => "tiny") %>
             <%= link_to h(repos.user.login), repos.user -%>
           </div>
         </li>

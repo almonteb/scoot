@@ -242,6 +242,10 @@ module ApplicationHelper
     markdown(text) rescue simple_format(sanitize(text))
   end
   
+  def markdown(text)
+    textilize(text)
+  end
+  
   def file_path(repository, filename, head = "master")
     project_repository_blob_path(repository.project, repository, head, filename)
   end

@@ -11,19 +11,10 @@ class Project < ActiveRecord::Base
     :class_name => "Repository"
   has_many    :events, :order => "created_at asc", :dependent => :destroy
   
-  is_indexed :fields => ["title", "description", "slug"], 
-    :concatenate => [
-      { :class_name => 'Tag',
-        :field => 'name',
-        :as => 'category',
-        :association_sql => "LEFT OUTER JOIN taggings ON taggings.taggable_id = projects.id " +
-                            "AND taggings.taggable_type = 'Project' LEFT OUTER JOIN tags ON taggings.tag_id = tags.id"
-      }],
-    :include => [{
-      :association_name => "user",
-      :field => "login",
-      :as => "user"
-    }]
+  define_index do
+    indexes title, description, slug
+    indexes user.login, :as => "user"
+  end
 
 
   URL_FORMAT_RE = /^(http|https|nntp):\/\//.freeze
@@ -69,6 +60,10 @@ class Project < ActiveRecord::Base
     'Other/Proprietary License',
     'None',
   ]
+  
+  def just_created?
+    created_at + 15.minutes > Time.now
+  end
 
   def self.find_by_slug!(slug, opts = {})
     find_by_slug(slug, opts) || raise(ActiveRecord::RecordNotFound)
@@ -141,7 +136,7 @@ class Project < ActiveRecord::Base
 
   protected
     def create_mainline_repository
-      self.repositories.create!(:user => self.user, :name => "mainline")
+      self.repositories.create!(:user => self.user, :name => title)
     end
 
     def downcase_slug

@@ -6,22 +6,18 @@
 <%= render :partial => "search_box" -%>
 
 <div class="search_results">
-<% if @search -%>
-  
   <% if @results.empty? -%>
     <p>Sorry, no results for "<%=h params[:q] -%>"</p>
   <% else -%>
     <% @results.each do |result| -%>
     <div class="item">
-      <%= render :partial => result, :object => result -%>
+      <%= render :partial => result %>
     </div>
     <% end -%>
-    <%= will_paginate(@search) -%>
+    <%= will_paginate(@results) -%>
   <% end -%>
-  
+
   <p class="hint">
-    <small>Found <%= @search.total_entries -%> results in <%= @search.time -%>ms</small>
+    <small>Found <%= @results.total_entries -%> results</small>
   </p>
-  
-<% end -%>
 </div>

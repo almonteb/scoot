@@ -58,7 +58,7 @@ class Repository < ActiveRecord::Base
   end
   
   def gitdir
-    File.join(project.slug, "#{name}.git")
+    File.join(project.user.login, "#{name}.git")
   end
   
   def clone_url
@@ -125,10 +125,11 @@ class Repository < ActiveRecord::Base
   end
   
   def create_new_repos_task
-    Task.create!(:target_class => self.class.name, 
-      :command => parent ? "clone_git_repository" : "create_git_repository", 
-      :arguments => parent ? [gitdir, parent.gitdir] : [gitdir], 
-      :target_id => self.id)
+    task = Task.create!(:target_class => self.class.name, 
+                 :command => parent ? "clone_git_repository" : "create_git_repository", 
+                 :arguments => parent ? [gitdir, parent.gitdir] : [gitdir], 
+                 :target_id => self.id)
+    TaskWorker.async_perform(task)
   end
   
   def create_delete_repos_task

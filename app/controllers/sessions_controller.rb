@@ -1,5 +1,3 @@
-  require "openid"
-  require "yadis"
 # This controller handles the login/logout function of the site.
 class SessionsController < ApplicationController
   # render new.rhtml
@@ -7,11 +5,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if using_open_id?
-      open_id_authentication(params[:openid_url])
-    else
-      password_authentication(params[:email], params[:password])
-    end
+    password_authentication(params[:email], params[:password])
   end
 
   def destroy
@@ -23,31 +17,6 @@ class SessionsController < ApplicationController
   end
 
   protected
-
-  # if user doesn't exist, it gets created and activated,
-  # else if the user already exists with same identity_url, it just logs in
-  def open_id_authentication(openid_url)
-    authenticate_with_open_id(openid_url, :required => [:nickname, :email], :optional => [:fullname]) do |result, identity_url, registration|
-      if result.successful?
-        @user = User.find_or_initialize_by_identity_url(identity_url)
-        if @user.new_record?
-          @user.login = registration['nickname']
-          @user.fullname = registration['fullname']
-          @user.email = registration['email']
-          @user.save!
-          @user.activate
-        end
-        self.current_user = @user
-        successful_login
-      else
-        failed_login result.message, 'openid'
-      end
-    end
-    rescue ActiveRecord::RecordInvalid => invalid
-    flash[:error] = "This login (<strong>#{@user.login}</strong>) already exists, please <a href="+@user.identity_url+">choose a different persona or modify the current one</a>"
-
-    redirect_to login_path(:method => 'openid')
-  end
 
   def password_authentication(email, password)
     ##self.current_user = User.authenticate(login, password)

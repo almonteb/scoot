@@ -25,8 +25,12 @@ class User < ActiveRecord::Base
   validates_uniqueness_of   :login, :email, :case_sensitive => false
 
   before_save :encrypt_password
-  before_create :make_activation_code
+  before_create :activate
   before_validation :lint_identity_url
+  
+  define_index do
+    indexes login
+  end
 
   def self.find_by_login!(name)
     find_by_login(name) || raise(ActiveRecord::RecordNotFound)

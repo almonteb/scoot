@@ -52,7 +52,7 @@ class ProjectsController < ApplicationController
     @project.user = current_user
     if @project.save
       @project.create_event(Action::CREATE_PROJECT, @project, current_user)
-      redirect_to projects_path
+      redirect_to project_path(@project)
     else
       render :action => 'new'
     end
