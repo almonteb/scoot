@@ -18,8 +18,8 @@
 
 class CommentsController < ApplicationController
   before_filter :login_required, :only => [:new, :create, :edit, :update, :destroy]
-  before_filter :find_project
-  before_filter :find_repository
+  before_filter :find_user_and_repository
+  before_filter :find_object
   
   def index
     @comments = @repository.comments.find(:all, :include => :user)
@@ -58,8 +58,10 @@ class CommentsController < ApplicationController
     end
   end
   
-  protected
-    def find_repository
-      @repository = @project.repositories.find_by_name!(params[:repository_id])
-    end
+  private
+  
+  def find_object
+    puts params.inspect
+    @object = @repository.git.commits(params[:commit_id]).first if params[:commit_id]
+  end
 end

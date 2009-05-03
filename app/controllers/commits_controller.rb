@@ -25,7 +25,6 @@ class CommitsController < ApplicationController
   end
 
   def show
-        puts @repository.inspect
     @diffmode = params[:diffmode] == "sidebyside" ? "sidebyside" : "inline"
     @git = @repository.git
     @commit = @git.commit(params[:id])

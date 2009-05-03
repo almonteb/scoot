@@ -24,7 +24,7 @@
 
 <% if logged_in? -%>
   <%= error_messages_for :comment -%>
-  <% form_for([@project, @repository, comment || Comment.new]) do |f| -%>
+  <% form_for(Comment.new, :url => commit_comments_path(@object)) do |f| -%>
     <% if sha1 -%>
       <%= f.hidden_field :sha1, :value => sha1 -%>
     <% end -%>

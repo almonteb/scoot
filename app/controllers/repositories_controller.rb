@@ -25,10 +25,15 @@ class RepositoriesController < ApplicationController
   skip_before_filter :public_and_logged_in, :only => [:writable_by]
   
   def index
-    @repositories = @user.repositories.find(:all, :include => [:user, :events, :project])
+    if @user
+      @repositories = @user.repositories.find(:all, :include => [:user, :events, :project])
+    else
+      @users = Repository.find(:all, :include => [:user, :events, :project]).group_by(&:user)
+    end
   end
     
   def show
+    @tree = "master"
     @repository = @user.repositories.find_by_name(params[:id])
     @events = @repository.events.paginate(:all, :page => params[:page], 
       :order => "created_at desc")
@@ -81,16 +86,15 @@ class RepositoriesController < ApplicationController
       end
       return
     end
-    @user = Project.new_by_cloning(@repository_to_clone, current_user)
-    @repository = @user.repositories.first
+
+    @repository = Repository.new_by_cloning(@repository_to_clone, current_user)
     @repository.name = params[:repository][:name]
     @repository.user = current_user
     
     respond_to do |format|
-      if @user.save
-        @user.create_event(Action::CLONE_REPOSITORY, @repository, current_user, @repository_to_clone.id)
+      if @repository.save
         
-        location = project_repository_path(@user, @repository)
+        location = user_repository_path(current_user, @repository)
         format.html { redirect_to location }
         format.xml  { render :xml => @repository, :status => :created, :location => location }        
       else

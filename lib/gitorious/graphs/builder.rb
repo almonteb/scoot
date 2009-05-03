@@ -37,7 +37,7 @@ module Gitorious
       end
       
       def self.construct_filename(repository, branch, name)
-        "#{repository.project.slug}_#{repository.name}_#{branch}_#{name}.png"
+        "#{repository.name}_#{repository.name}_#{branch}_#{name}.png"
       end
       
       def self.status_file(repository, branch = "master")

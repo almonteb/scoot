@@ -60,6 +60,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     @user.login = params[:user][:login]
+    @user.activated_at = Time.now
     @user.save!
     self.current_user = @user
     flash[:notice] = "Thanks for signing up!"

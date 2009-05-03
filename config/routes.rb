@@ -76,20 +76,29 @@ ActionController::Routing::Routes.draw do |map|
   map.faq "about/faq", :controller => "site", :action => "faq"
   
   map.user ':id', :controller => "users", :action => "show"
+  
+  # As ugly as... all for the sake of prettiness
   map.user_repository ':user_id/:id', :controller => "repositories", :action => "show"
   
   map.user_repository_logs ':user_id/:repository_id/logs', :controller => "logs", :action => "index"
   map.user_repository_log  ':user_id/:repository_id/logs/:id', :controller => "logs", :action => "show"
   map.user_repository_trees ':user_id/:repository_id/trees', :controller => "trees", :action => "index"
-  map.user_repository_tree ':user_id/:repository_id/trees/:id', :controller => "trees", :action => "show"
+  map.user_repository_tree ':user_id/:repository_id/trees/:id/*path', :controller => "trees", :action => "show"
   map.user_repository_tree_logs ':user_id/:repository_id/tree/:id/logs', :controller => "logs", :action => "index"
   
   map.user_repository_comments ':user_id/:repository_id/comments', :controller => "comments", :action => "index"
   
+  map.user_repository_raw_blob ':user_id/:repository_id/blobs/:id/raw/*path', :controller => "blobs", :action => "raw"
+  map.user_repository_blob ':user_id/:repository_id/blobs/:id/*path', :controller => "blobs", :action => "show"
+  
   map.user_repository_commit ':user_id/:repository_id/commits/:id', :controller => "commits", :action => "show"
-  map.user_repository_commit_comments ':user_id/:repository_id/commits/:id/comments', :controller => "comments", :action => "index"
+  map.user_repository_commit_comments ':user_id/:repository_id/commits/:commit_id/comments', :controller => "comments", :action => "index"
   map.user_repository_merge_requests ':user_id/:repository_id/merge_requests', :controller => "merge_requests", :action => "index"
   
+  map.clone_user_repository ':user_id/:id/clone', :controller => "repositories", :action => "clone"
+  map.create_clone_user_repository ':user_id/:id/create_clone', :controller => "repositories", :action => "create_clone"
+  
+  map.user_repository_path ':user_id/:repository_id', :controller => "repositories", :action => "show"
   map.connect ':user_id/:id/writable_by', :controller => "repositories", :action => "writable_by"
   map.namespace :admin do |admin|
     admin.resources :users, :member => { :suspend => :put, :unsuspend => :put, :reset_password => :put }

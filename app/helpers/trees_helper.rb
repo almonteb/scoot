@@ -19,7 +19,7 @@ module TreesHelper
   include RepositoriesHelper
   
   def current_path
-    params[:path].dup
+    (params[:path] || "").dup
   end
   
   def build_tree_path(path)
@@ -53,9 +53,5 @@ module TreesHelper
     end
     out
   end
-  
-  # FIXME: This really belongs somewhere else, but where?
-  def commit_for_tree_path(repository, path)
-    repository.git.log(params[:id], path, {:max_count => 1}).first
-  end
+
 end

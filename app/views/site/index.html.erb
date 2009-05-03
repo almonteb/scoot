@@ -48,15 +48,15 @@
 
 <% if GitoriousConfig['public_mode'] || logged_in? -%>
 <div id="newest_projects">
-  <h2><%= t("views.site.newest_projects") %></h2>
+  <h2>New Repositories</h2>
   <ul>
-    <% @projects.each do |project| -%>
+    <% @repositories.each do |repository| -%>
       <li>
-        <strong><%= link_to h(project.title), project -%></strong>
-        <small class="hint"><%= truncate(h(project.stripped_description), :length => 100) -%></small>
+        <strong><%= link_to repository.user.login, repository.user %>/<%= link_to h(repository.name), [repository.user, repository] -%></strong>
+        <small class="hint"><%= truncate(h(repository.description), 100)  -%></small>
       </li>
     <% end -%>
   </ul>
-  <p><%= link_to t("views.site.view_more"), projects_path -%></p>
+  <p><%= link_to t("views.site.view_more"), repositories_path -%></p>
 </div>
 <% end -%>

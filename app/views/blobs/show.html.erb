@@ -17,7 +17,6 @@
 #++
 %>
 
-<% @page_title = t("views.blobs.page_title", :path => current_path.join("/"), :repo => @repository.name, :title => @project.title) -%>
 <% @load_syntax_themes = true -%>
 
 <% content_for :submenu do -%>
@@ -41,7 +40,7 @@
 
 <%= breadcrumb_path(@repository.name, @commit.id) -%>
 
-<% if @blob.mime_type =~ /^text/ && !too_big_to_render?(@blob.size) -%>
+<% if @blob.mime_type =~ /^text/ || @blob.mime_type =~ /ruby/ && !too_big_to_render?(@blob.size) -%>
   <% cache(blob_path(@commit.id, params[:path])) do -%>
     <%= render_highlighted(@blob.data, current_path.last || "") -%>
   <% end -%>

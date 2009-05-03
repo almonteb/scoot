@@ -69,9 +69,4 @@ Rails::Initializer.run do |config|
   # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
 
   # Activate observers that should always be running
-  config.active_record.observers = [
-      :user_observer, 
-      :repository_observer, 
-      :merge_request_observer
-  ]
 end

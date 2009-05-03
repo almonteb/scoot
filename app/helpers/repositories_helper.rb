@@ -33,7 +33,7 @@ module RepositoriesHelper
     if path.respond_to?(:to_str)
       path = path.split("/")
     end
-    user_repository_tree_path(@user, @repository, treeish)
+    user_repository_tree_path(@user, @repository, treeish, path)
   end
   
   def archive_tree_path(treeish = "master")

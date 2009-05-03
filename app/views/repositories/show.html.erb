@@ -25,55 +25,71 @@
   <%= render :partial => "infobox" -%>
   
   <%= render_readme(@repository) %>
-<% if current_user == @repository.user && !@repository.has_commits? %>
-<div id='setup_tips'>
-  <h2>Global Setup:</h2>
-    <pre>
-    Download and install Git
-    git config --global user.name "<%= @user.fullname %>"
-    git config --global user.email "<%= @user.email %>"
-    </pre>
+<% unless current_user == @repository.user && !@repository.has_commits? %>
 
-  <h2>Next steps:</h2>
-    <pre>
-    mkdir test
-    cd test
-    git init
-    touch README
-    git add README
-    git commit -m 'first commit'
-    git remote add origin git@github.com:radar/test.git
-    git push origin master</pre>
-
-  <h2>Existing Git Repo?</h2>
-    <pre>
-    cd existing_git_repo
-    git remote add origin git@github.com:radar/test.git
-    git push origin master
-    </pre>
-
-  <h2>Importing a SVN Repo?</h2>
-    <strong>Good luck, have fun.</strong>
-</div>
-<% else %>
-<table id='file_listing' width='100%'>
+<table class="listing tree">
   <thead>
     <tr>
-      <td>name</td>
-      <td>age</td>
-      <td>message</td>
-    </tr>
-  </thead>
-  <tbody>
-    <% for blob in @repository.git.tree.contents %>
-      <tr>
-      <td><%= blob.name %></td>
-      <td><%= blob.mime_type if blob.respond_to?(:mime_type) %></td>
-      <td>sdfdsf</td>
-    <% end %>
-  </tbody>
+      <td>Name</td>
+      <td>Last modified</td>
+      <td>Commit</td>
+  <% @repository.git.tree.contents.sort_by{|c| c.name.downcase}.each do |node| -%>
+  <tr class="<%= cycle("odd", "even") -%>">
+    <% if node.is_a? Grit::Tree -%>
+      <td class="node tree"><%= link_to h(node.basename) + "/", tree_path(params[:id], node.name) -%></td>
+    <% elsif node.is_a? Grit::Submodule -%>
+    <td class="node submodule"><%= h(node.basename) -%></td>
+    <% else -%>
+      <td class="node file"><%= link_to h(node.basename), blob_path(params[:id], node.name).gsub("%2F","/") -%></td>
+    <% end -%>
+    <% if node.is_a? Grit::Submodule -%>
+      <td class="meta"></td>
+      <td class="meta commit_message">submodule: <%= h(node.url(params[:id])) -%></td>
+    <% else -%>
+      <% if last_commit = @repository.git.log(@tree, node.name).first -%>
+        <td class="meta"><%= last_commit.committed_date.to_s(:short) -%></td>
+        <td class="meta commit_message">
+          <%= link_to truncate(h(last_commit.message), :length => 75, :omission => "&hellip;"), commit_path(last_commit.id) -%> [<%= last_commit.committer %>]
+        </td>
+      <% else -%>
+        <td class="meta"></td>
+        <td class="meta commit_message"></td>
+      <% end -%>
+    <% end -%>
+  </tr>
+  <% end -%>
 </table>
-  
+<% else %>
+  <div id='setup_tips'>
+    <h2>Global Setup:</h2>
+      <pre>
+      Download and install Git
+      git config --global user.name "<%= @user.fullname %>"
+      git config --global user.email "<%= @user.email %>"
+      </pre>
+
+    <h2>Next steps:</h2>
+      <pre>
+      mkdir test
+      cd test
+      git init
+      touch README
+      git add README
+      git commit -m 'first commit'
+      git remote add origin git@github.com:radar/test.git
+      git push origin master</pre>
+
+    <h2>Existing Git Repo?</h2>
+      <pre>
+      cd existing_git_repo
+      git remote add origin git@github.com:radar/test.git
+      git push origin master
+      </pre>
+
+    <h2>Importing a SVN Repo?</h2>
+      <strong>Good luck, have fun.</strong>
+  </div>
+
 <% end %>  
   <h2><%= t("views.repos.activities") %> <%= feed_icon @atom_auto_discovery_url %></h2>
   <%= render :partial => "events/events", :locals => { :events => @events } -%>
@@ -88,17 +104,17 @@
   <ul>
     <li><strong><%= t("views.logs.maintainer") %>:</strong> <%= link_to h(@repository.user.login), user_path(@repository.user) -%></li>
     <% if @repository.parent -%>
-    <li><strong><%= t("views.repos.clone_of") %>:</strong> <%= link_to h(@repository.parent.gitdir), project_repository_path(@project, @repository.parent) -%>
+    <li><strong><%= t("views.repos.clone_of") %>:</strong> <%= link_to "#{@repository.parent.user.login}/#{@repository.parent.name}", user_repository_path(@repository.parent.user, @repository.parent.name) -%>
     <% end -%>
     <li><strong><%= t("views.repos.created") %>:</strong> <%= @repository.created_at.to_s(:short) -%></li>
   </li>
   
   <ul class="links">
     <% if @repository.ready? -%>
-      <li><%= link_to t("views.repos.btn_clone"), clone_project_repository_path(@project, @repository) -%></li>
+      <li><%= link_to "Fork", clone_user_repository_path(@user, @repository) -%></li>
     <% end -%>
     <% if @repository.committers.include?(current_user) -%>
-      <li><%= link_to t("views.repos.btn_request"), new_project_repository_merge_request_path(@project, @repository) -%></li>
+      <li><%= link_to "Merge request", new_project_repository_merge_request_path(@user, @repository) -%></li>
       <% if @repository.user == current_user -%>
       <li><%= link_to t("views.repos.btn_add_committer"),
               { :controller => "committers", :action => "new", :project_id => @project,
@@ -130,15 +146,24 @@
   <% end -%>
   </ul>
 
-  <% unless @commits.blank? -%>
+  <% unless @repository.git.commits.blank? -%>
     <h4><%= t("views.logs.branches") %>:</h4>
     <ul>
       <% @repository.git.branches.each do |branch| -%>
         <% if namespaced_branch?(branch.name) -%>
-            <li><%= link_to h(branch.name), project_repository_log_path(@project, @repository, branch.commit.id) -%></li>
+            <li><%= link_to h(branch.name), user_repository_log_path(@user, @repository, branch.commit.id) -%></li>
         <% else -%>
-          <li><%= link_to h(branch.name), project_repository_log_path(@project, @repository, branch.name) -%></li>
+          <li><%= link_to h(branch.name), user_repository_log_path(@user, @repository, branch.name) -%></li>
         <% end -%>
+      <% end -%>
+    </ul>
+  <% end -%>
+
+  <% unless @repository.children.empty? -%>
+    <h4>Forks:</h4>
+    <ul>
+      <% @repository.children.each do |children| -%>
+        <li><%= link_to h(children.name), user_repository_path(children.user, children) %></li>
       <% end -%>
     </ul>
   <% end -%>

@@ -41,12 +41,17 @@ class Repository < ActiveRecord::Base
   validates_presence_of :user_id, :name
   validates_format_of :name, :with => /^[a-z0-9_\-]+$/i,
     :message => "is invalid, must match something like /[a-z0-9_\\-]+/"
-  validates_uniqueness_of :name, :scope => :project_id, :case_sensitive => false
   
   before_validation_on_create :permalink_name
   before_save :set_as_mainline_if_first
   after_create :add_user_as_committer, :create_new_repos_task
   after_destroy :create_delete_repos_task
+  
+  
+  def self.new_by_cloning(other, user)
+    suggested_name = other.name
+    user.repositories.build(:parent => other, :name => suggested_name, :mainline => true)
+  end
   
   def self.find_by_name!(name)
     find_by_name(name) || raise(ActiveRecord::RecordNotFound)
@@ -256,6 +261,12 @@ class Repository < ActiveRecord::Base
   def project_repo?
     kind == KIND_PROJECT_REPO
   end
+  
+    
+  def children
+    Repository.find_all_by_parent_id(self.id)
+  end
+
   
   protected
     def set_as_mainline_if_first

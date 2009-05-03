@@ -18,9 +18,9 @@
 #++
 %>
 
-<% @page_title = t("views.trees.page_title", :repo => @repository.name, :title => @project.title) -%>
+<% @page_title = "Viewing a tree" -%>
 <h1>
-  <%= t("views.trees.title", :repo => h(@repository.name), :title => h(@project.title)) %>
+  <%= @repository.name %>
 </h1>
 
 <% content_for :submenu do -%>
@@ -31,6 +31,11 @@
 
 <% cache(tree_path(@commit.id, params[:path])) do -%>
 <table class="listing tree">
+  <thead>
+    <tr>
+      <td>Name</td>
+      <td>Last modified</td>
+      <td>Commit</td>
   <% @tree.contents.sort_by{|c| c.name.downcase}.each do |node| -%>
   <tr class="<%= cycle("odd", "even") -%>">
     <% if node.is_a? Grit::Tree -%>
@@ -47,7 +52,7 @@
       <% if last_commit = commit_for_tree_path(@repository, node.name) -%>
         <td class="meta"><%= last_commit.committed_date.to_s(:short) -%></td>
         <td class="meta commit_message">
-          <%= link_to truncate(h(last_commit.message), :length => 75, :omission => "&hellip;"), commit_path(last_commit.id) -%>
+          <%= link_to truncate(h(last_commit.message), :length => 75, :omission => "&hellip;"), commit_path(last_commit.id) -%> [<%= last_commit.committer %>]
         </td>
       <% else -%>
         <td class="meta"></td>
@@ -57,11 +62,6 @@
   </tr>
   <% end -%>
 </table>
-<% end -%>
-<% if logged_in? -%>
-<p>
-  <small><%= link_to t("views.trees.download"), archive_tree_path(@commit.id) -%></small>
-</p>
 <% end -%>
 
 <% content_for :sidebar do -%>  
@@ -74,13 +74,6 @@
         <li><%= link_to h(branch.name), tree_path(branch.name) -%></li>
       <% end -%>
     <% end -%>
-  </ul>
-
-  <h5><%= t("views.logs.tags") %>:</h5>
-  <ul class="links">
-  <% @git.tags.sort{|a, b| a.name <=> b.name }.each do |tag| -%>
-    <li><%= link_to h(tag.name), commit_path(tag.commit.id) -%></li>
-  <% end -%>
   </ul>
 <% end -%>
 

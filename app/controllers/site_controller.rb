@@ -21,8 +21,8 @@ class SiteController < ApplicationController
   before_filter :login_required, :only => [:dashboard]
   
   def index
-    @projects = if GitoriousConfig['public_mode'] || logged_in?
-      Project.find(:all, :limit => 10, :order => "id desc")
+    @repositories = if GitoriousConfig['public_mode'] || logged_in?
+      Repository.find(:all, :limit => 10, :order => "id desc")
     else
       []
     end

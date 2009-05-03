@@ -290,4 +290,8 @@ module ApplicationHelper
   def file_path(repository, filename, head = "master")
     project_repository_blob_path(repository.project, repository, head, filename)
   end
+  
+  def commit_for_tree_path(repository, path)
+    repository.git.log(params[:id], path, {:max_count => 1}).first
+  end
 end

@@ -80,13 +80,6 @@ class Project < ActiveRecord::Base
     'Other/Proprietary License',
     'None',
   ]
-  
-  def self.new_by_cloning(other, user)
-    suggested_name = other.name
-    project = user.projects.build(other.project.attributes)
-    project.repositories.build(:parent => other, :name => suggested_name, :mainline => true)
-    project
-  end
 
   def self.find_by_slug!(slug, opts = {})
     find_by_slug(slug, opts) || raise(ActiveRecord::RecordNotFound)

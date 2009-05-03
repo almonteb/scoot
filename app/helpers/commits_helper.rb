@@ -86,7 +86,7 @@ module CommitsHelper
   def render_diff_stats(stats)
     out = %Q{<ul class="diff_stats">\n}
     stats.files.each do |filename, adds, deletes, total|
-      out << %Q{<li><a href="##{h(filename)}">#{h(filename)}</a>&nbsp;#{total}&nbsp;}
+      out << %Q{<li><a href="##{h(filename)}">#{h(filename)}</a>&nbsp;}
       out << %Q{<small class="deletions">#{pluralize(deletes, "deletions")}</small>, }
       out << %Q{<small class="insertions">#{pluralize(adds, "additions")}</small>}
       out << %Q{</li>}
