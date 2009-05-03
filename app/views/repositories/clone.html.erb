@@ -19,7 +19,7 @@
 
 <h1><%= t("views.repos.create_title").call(self, @repository_to_clone, @project) %></h1>
 
-<%= error_messages_for :repository -%>
+<%= error_messages_for :repository, :project -%>
 
 <% form_for @repository, :repository, 
       :url => create_clone_project_repository_path(@project, @repository_to_clone) do |f| -%>

@@ -134,5 +134,5 @@ while line = gets
   end
 end
 
-puts "[OK]"
+# puts "[OK]"
 

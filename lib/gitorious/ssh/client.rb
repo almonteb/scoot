@@ -41,12 +41,7 @@ module Gitorious
       end
     
       def query_url
-        url = ["/projects"]
-        url << @repository_name
-        url << "repos"
-        url << @repository_name
-        url << "writable_by?username=#{@user_name}"
-        url.join("/")
+        url = "/#{@user_name}/#{@repository_name}/writable_by?username=#{@user_name}"
       end
     
       def to_git_shell_argument

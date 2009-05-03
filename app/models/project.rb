@@ -38,7 +38,7 @@ class Project < ActiveRecord::Base
 
   URL_FORMAT_RE = /^(http|https|nntp):\/\//.freeze
   validates_presence_of :title, :user_id, :slug, :description
-  validates_uniqueness_of :slug, :case_sensitive => false
+  validates_uniqueness_of :slug, :case_sensitive => false, :scope => :user_id
   validates_format_of :slug, :with => /^[a-z0-9_\-]+$/i,
     :message => I18n.t( "project.format_slug_validation")
   validates_format_of :home_url, :with => URL_FORMAT_RE,
@@ -80,6 +80,13 @@ class Project < ActiveRecord::Base
     'Other/Proprietary License',
     'None',
   ]
+  
+  def self.new_by_cloning(other, user)
+    suggested_name = other.name
+    project = user.projects.build(other.project.attributes)
+    project.repositories.build(:parent => other, :name => suggested_name, :mainline => true)
+    project
+  end
 
   def self.find_by_slug!(slug, opts = {})
     find_by_slug(slug, opts) || raise(ActiveRecord::RecordNotFound)

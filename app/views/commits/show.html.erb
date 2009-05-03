@@ -19,7 +19,7 @@
 #++
 %>
 
-<% @page_title = t("views.commits.page_title", :repo => @repository.name, :title => @project.title) -%>
+<% @page_title = "Viewing commit #{@commit.id} for #{@user.login}'s #{@repository.name}"-%>
 
 <h1><%= t("views.commits.title", :commit => h( @commit.id)) %></h1>
 
@@ -30,7 +30,7 @@
 <ul class="tab_menu">
   <li class="selected"><%= t("views.comments.diff") %></li>
   <li><%= link_to t("views.comments.total", :total => @comment_count), 
-            project_repository_commit_comment_path(@project, @repository, @commit.id) -%></li>
+            user_repository_commit_comments_path(@user, @repository, @commit.id) -%></li>
 </ul>
 
 

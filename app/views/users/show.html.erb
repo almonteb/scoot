@@ -35,7 +35,7 @@
 
   <div style="float: right;"><%= link_to(gravatar(@user.email, { :size => 64 }), :action => "show") %></div>
   <ul>
-    <li><strong>Email:</strong> <%= GitoriousConfig["mangle_email_addresses"] ? encoded_mail_to(@user.email) : mail_to(@user.email) -%></li>
+    <li><strong>Email:</strong> <%= mail_to(@user.email) -%></li>
     <% if @user.url %>
       <li><strong>Url:</strong> <a rel="me" href="<%=h @user.url -%>"><%=h @user.url -%></a></li>
     <% end -%>
@@ -44,11 +44,11 @@
   </ul>
 
 
-  <% unless @projects.blank? -%>
-    <h4><%= t("views.site.dashboard.projects") %>:</h4>
+  <% unless @user.repositories.blank? -%>
+    <h4>Repositories:</h4>
     <ul>
-    <% @projects.each do |project| -%>
-      <li><%= link_to h(project.slug), project -%></li>
+    <% @user.repositories.each do |repository| -%>
+      <li><%= link_to h(repository.name), [@user, repository] -%></li>
     <% end -%>
     </ul>
   <% end -%>

@@ -20,7 +20,7 @@
 
 <p>
   <%= form.label :title, t(:title, :scope => 'activerecord.attributes.project') -%><br />
-  <%= form.text_field :title, :class => "text" -%> http://github.com/<%= current_user.login %>/<%= form.text_field :slug, :class => "text" -%>
+  <%= form.text_field :title, :class => "text" -%> http://github.com/<%= current_user.permalink %>/<%= form.text_field :slug, :class => "text" -%>
 </p>
 <script type="text/javascript" charset="utf-8">
   var slugger = new ProjectSluggorizer("project_title", "project_slug");

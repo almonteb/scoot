@@ -1,0 +1,5 @@
+<h1>Users</h1>
+<% for user in @users %>
+  <h3><%= link_to h(user.fullname) + " (#{user.login})", user_path(user) -%></h3>
+  <strong>Repositories:</strong> <%= user.repositories.first(10).map(&:name).to_sentence %>
+<% end %>

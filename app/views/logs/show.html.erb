@@ -18,10 +18,8 @@
 #++
 %>
 
-<% @page_title = t("views.logs.page_title", :repo => h(@repository.name), :title => h(@project.title)) -%>
-<h1>
-  <%= t("views.logs.commitlog", :repo => h(@repository.name), :param => h(params[:id]), :title => h(@project.title)) -%>
-</h1>
+<% @page_title = "Viewing commit history for branch #{@branch} of #{@user.login}'s '#{@repository.name}" %>
+<h1>Commit History</h1>
 
 <div class="commit_graph">
   <%= commit_graph_tag(@repository) %>
@@ -35,7 +33,6 @@
 
 <% content_for :sidebar do -%>  
   <ul>
-    <li><strong><%= t("views.logs.project") %>:</strong> <%= link_to h(@repository.project.title), @repository.project -%></li>
     <li><strong><%= t("views.logs.maintainer") %>:</strong> <%= link_to h(@repository.user.login), @repository.user -%></li>
     <% unless @commits.blank? -%>
     <li><strong><%= t("views.logs.head_tree") %>:</strong> <%= link_to h(@commits.first.tree.id[0,7]), 

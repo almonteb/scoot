@@ -19,12 +19,17 @@
 class UsersController < ApplicationController
   skip_before_filter :public_and_logged_in, :only => [:activate, :forgot_password, :reset_password]
   
+  def index
+    @users = User.all(:order => "login")
+  end
+  
   # render new.rhtml
   def new
   end
   
   def show
-    @user = User.find_by_login!(params[:id])
+    @user = User.find_by_permalink(params[:id])
+    @user ||= current_user
     @projects = @user.projects.find(:all, :include => [:tags, { :repositories => :project }])
     @repositories = @user.repositories.find(:all, :conditions => ["mainline = ?", false])
     @events = @user.events.paginate(:all, 

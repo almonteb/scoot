@@ -18,22 +18,21 @@
 
 class RepositoriesController < ApplicationController
   before_filter :login_required, :except => [:index, :show, :writable_by]
-  before_filter :find_project
+  before_filter :find_user
   before_filter :require_adminship, :only => [:edit, :update]
   before_filter :require_user_has_ssh_keys, :only => [:clone, :create_clone]
   session :off, :only => [:writable_by]
   skip_before_filter :public_and_logged_in, :only => [:writable_by]
   
   def index
-    @repositories = @project.repositories.find(:all, :include => [:user, :events, :project])
+    @repositories = @user.repositories.find(:all, :include => [:user, :events, :project])
   end
     
   def show
-    @repository = @project.repositories.find_by_name!(params[:id])
+    @repository = @user.repositories.find_by_name(params[:id])
     @events = @repository.events.paginate(:all, :page => params[:page], 
       :order => "created_at desc")
-    
-    @atom_auto_discovery_url = formatted_project_repository_path(@project, @repository, :atom)
+
     respond_to do |format|
       format.html
       format.xml  { render :xml => @repository }
@@ -41,20 +40,35 @@ class RepositoriesController < ApplicationController
     end
   end
   
+  def new
+    @repository = current_user.repositories.build
+  end
+  
+  def create
+    @repository = current_user.repositories.build(params[:repository])
+    if @repository.save
+      flash[:notice] = "Your repository has been created."
+      redirect_to user_repository_path(current_user, @repository)
+    else
+      flash[:error] = "Your repository could not be created."
+      render :action => "new"
+    end
+  end
+  
   def clone
-    @repository_to_clone = @project.repositories.find_by_name!(params[:id])
+    @repository_to_clone = @user.repositories.find_by_name!(params[:id])
     unless @repository_to_clone.has_commits?
       flash[:error] = I18n.t "repositories_controller.new_error"
-      redirect_to project_repository_path(@project, @repository_to_clone)
+      redirect_to project_repository_path(@user, @repository_to_clone)
       return
     end
-    @repository = Repository.new_by_cloning(@repository_to_clone, current_user)
+    @repository = Project.new_by_cloning(@repository_to_clone, current_user).repositories.first
   end
   
   def create_clone
-    @repository_to_clone = @project.repositories.find_by_name!(params[:id])
+    @repository_to_clone = @user.repositories.find_by_name!(params[:id])
     unless @repository_to_clone.has_commits?
-      target_path = project_repository_path(@project, @repository_to_clone)
+      target_path = project_repository_path(@user, @repository_to_clone)
       respond_to do |format|
         format.html do
           flash[:error] = I18n.t "repositories_controller.create_error"
@@ -67,15 +81,16 @@ class RepositoriesController < ApplicationController
       end
       return
     end
-    @repository = Repository.new_by_cloning(@repository_to_clone, current_user)
+    @user = Project.new_by_cloning(@repository_to_clone, current_user)
+    @repository = @user.repositories.first
     @repository.name = params[:repository][:name]
     @repository.user = current_user
     
     respond_to do |format|
-      if @repository.save
-        @project.create_event(Action::CLONE_REPOSITORY, @repository, current_user, @repository_to_clone.id)
+      if @user.save
+        @user.create_event(Action::CLONE_REPOSITORY, @repository, current_user, @repository_to_clone.id)
         
-        location = project_repository_path(@project, @repository)
+        location = project_repository_path(@user, @repository)
         format.html { redirect_to location }
         format.xml  { render :xml => @repository, :status => :created, :location => location }        
       else
@@ -87,7 +102,7 @@ class RepositoriesController < ApplicationController
   
   # Used internally to check write permissions by gitorious
   def writable_by
-    @repository = @project.repositories.find_by_name!(params[:id])
+    @repository = @user.repositories.find_by_name!(params[:id])
     user = User.find_by_login(params[:username])
     if user && user.can_write_to?(@repository)
       render :text => "true"
@@ -97,28 +112,28 @@ class RepositoriesController < ApplicationController
   end
   
   def confirm_delete
-    @repository = @project.repositories.find_by_name!(params[:id])
+    @repository = @user.repositories.find_by_name!(params[:id])
   end
   
   def destroy
-    @repository = @project.repositories.find_by_name!(params[:id])
+    @repository = @user.repositories.find_by_name!(params[:id])
     if @repository.can_be_deleted_by?(current_user)
       repo_name = @repository.name
       flash[:notice] = I18n.t "repositories_controller.destroy_notice"
       @repository.destroy
-      @project.create_event(Action::DELETE_REPOSITORY, @project, current_user, repo_name)
+      @user.create_event(Action::DELETE_REPOSITORY, @user, current_user, repo_name)
     else
       flash[:error] = I18n.t "repositories_controller.destroy_error"
     end
-    redirect_to project_path(@project)
+    redirect_to user_path(@user)
   end
   
   private    
     def require_adminship
-      unless @project.admin?(current_user)
+      unless @user.admin?(current_user)
         respond_to do |format|
           flash[:error] = I18n.t "repositories_controller.adminship_error"
-          format.html { redirect_to(project_path(@project)) }
+          format.html { redirect_to(user_path(@user)) }
           format.xml  { render :text => I18n.t( "repositories_controller.adminship_error"), :status => :forbidden }
         end
         return

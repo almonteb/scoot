@@ -49,13 +49,13 @@
         <li><%= link_to t("views.layout.home"), root_path -%></li>
       <% end -%>
       <% if logged_in? -%>
-        <li><%= link_to t("views.layout.dashboard"), dashboard_path -%></li>
+        <li><%= link_to "New Repository", new_repository_path %></li>
 		<% if current_user.admin? -%>
 		<li><%= link_to t("views.layout.admin"), admin_users_path -%></li>
 		<% end -%>
       <% end -%>
       <% if GitoriousConfig['public_mode'] || logged_in? -%>
-        <li><%= link_to t("views.layout.projects"), projects_path -%></li>
+        <li><%= link_to "Users", users_path -%></li>
         <li><%= link_to t("views.layout.search"), search_path -%></li>
       <% end -%>
       <% if logged_in? -%>
@@ -66,7 +66,7 @@
       <%- if logged_in? -%>
         <li class="secondary">( <%= link_to t("views.layout.my_account"), account_path -%></li>
         <li class="secondary"><%= link_to t("views.layout.logout"), logout_path -%> )</li>
-        <li class="secondary">Logged in as <%= current_user.login %></li>
+        <li class="secondary">Logged in as <%= link_to current_user.login, user_path(current_user) %></li>
       <%- else -%>
 		<% if GitoriousConfig['public_mode'] -%>
         	<li class="secondary"><%= link_to "Register", new_user_path -%></li>

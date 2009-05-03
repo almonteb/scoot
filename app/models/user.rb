@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   attr_protected :login, :is_admin
 
   validates_presence_of     :login, :email,               :if => :password_required?
+  validates_presence_of     :fullname
   validates_format_of       :login, :with => /^[a-z0-9\-_\.]+$/i
   validates_format_of       :email, :with => /^[^@\s]+@([\-a-z0-9]+\.)+[a-z]{2,}$/i
   validates_presence_of     :password,                   :if => :password_required?
@@ -46,7 +47,8 @@ class User < ActiveRecord::Base
 
   before_save :encrypt_password
   before_create :make_activation_code
-  before_validation :lint_identity_url
+  before_create :make_permalink
+
 
   def self.find_by_login!(name)
     find_by_login(name) || raise(ActiveRecord::RecordNotFound)
@@ -172,6 +174,11 @@ class User < ActiveRecord::Base
   end
 
   protected
+  
+    def make_permalink
+      self.permalink = login.parameterize
+    end
+    
     # before filter
     def encrypt_password
       return if password.blank?
@@ -191,10 +198,4 @@ class User < ActiveRecord::Base
       self.activation_code = Digest::SHA1.hexdigest( Time.now.to_s.split(//).sort_by {rand}.join )
     end
     
-    def lint_identity_url
-      return if not_openid?
-      self.identity_url = OpenIdAuthentication.normalize_identifier(self.identity_url)
-    rescue OpenIdAuthentication::InvalidOpenId
-      # validate will catch it instead
-    end
 end

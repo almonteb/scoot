@@ -56,9 +56,13 @@ class ApplicationController < ActionController::Base
       @project = Project.find_by_slug!(params[:project_id])
     end
     
-    def find_project_and_repository
-      @project = Project.find_by_slug!(params[:project_id])
-      @repository = @project.repositories.find_by_name!(params[:repository_id])
+    def find_user
+      @user = User.find_by_permalink(params[:user_id])
+    end
+    
+    def find_user_and_repository
+      find_user
+      @repository = @user.repositories.find_by_name!(params[:repository_id])
     end
     
     def check_repository_for_commits

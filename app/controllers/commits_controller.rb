@@ -17,14 +17,15 @@
 #++
 
 class CommitsController < ApplicationController
-  before_filter :find_project_and_repository
+  before_filter :find_user_and_repository
   before_filter :check_repository_for_commits
   
   def index
-    redirect_to project_repository_log_path(@project, @repository, @repository.head_candidate.name)
+    redirect_to user_repository_log_path(@user, @repository, @repository.head_candidate.name)
   end
 
   def show
+        puts @repository.inspect
     @diffmode = params[:diffmode] == "sidebyside" ? "sidebyside" : "inline"
     @git = @repository.git
     @commit = @git.commit(params[:id])

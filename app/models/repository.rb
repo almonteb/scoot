@@ -38,20 +38,15 @@ class Repository < ActiveRecord::Base
   has_many    :cloners, :dependent => :destroy
   has_many    :events, :as => :target, :dependent => :destroy
   
-  validates_presence_of :user_id, :project_id, :name
+  validates_presence_of :user_id, :name
   validates_format_of :name, :with => /^[a-z0-9_\-]+$/i,
     :message => "is invalid, must match something like /[a-z0-9_\\-]+/"
   validates_uniqueness_of :name, :scope => :project_id, :case_sensitive => false
   
+  before_validation_on_create :permalink_name
   before_save :set_as_mainline_if_first
   after_create :add_user_as_committer, :create_new_repos_task
   after_destroy :create_delete_repos_task
-  
-  def self.new_by_cloning(other, user)
-    suggested_name = other.name
-    p = user.projects.build(other.project.attributes)
-    p.repositories.build(:parent => other, :project => other.project, :name => suggested_name)
-  end
   
   def self.find_by_name!(name)
     find_by_name(name) || raise(ActiveRecord::RecordNotFound)
@@ -86,7 +81,7 @@ class Repository < ActiveRecord::Base
   end
   
   def gitdir
-    File.join(project.user.login.downcase, "#{name}.git")
+    File.join(user.login.downcase, "#{name}.git")
   end
   
   def clone_url
@@ -264,9 +259,7 @@ class Repository < ActiveRecord::Base
   
   protected
     def set_as_mainline_if_first
-      unless project.repositories.size >= 1
-        self.mainline = true
-      end
+      self.mainline = true
     end
     
     def add_user_as_committer
@@ -278,6 +271,11 @@ class Repository < ActiveRecord::Base
     end
     
   private
+  
+  def permalink_name
+    self.name = name.parameterize
+  end
+  
   def self.create_hooks(path)
     hooks = File.join(GitoriousConfig["repository_base_path"], ".hooks")
     Dir.chdir(path) do

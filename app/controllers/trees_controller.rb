@@ -16,11 +16,11 @@
 #++
 
 class TreesController < ApplicationController
-  before_filter :find_project_and_repository
+  before_filter :find_user_and_repository
   before_filter :check_repository_for_commits
   
   def index
-    redirect_to(project_repository_tree_path(@project, @repository, 
+    redirect_to(user_repository_tree_path(@user, @repository, 
         @repository.head_candidate_name, []))
   end
   
@@ -28,7 +28,7 @@ class TreesController < ApplicationController
     @git = @repository.git
     @commit = @git.commit(params[:id])
     unless @commit
-      redirect_to project_repository_tree_path(@project, @repository, "HEAD", params[:path])
+      redirect_to user_repository_tree_path(@user, @repository, "HEAD", params[:path])
       return
     end
     path = params[:path].blank? ? [] : ["#{params[:path].join("/")}/"] # FIXME: meh, this sux
@@ -40,13 +40,13 @@ class TreesController < ApplicationController
     @commit = @git.commit(params[:id])
     
     if @commit
-      prefix = "#{@project.slug}-#{@repository.name}"
+      prefix = "#{@user.slug}-#{@repository.name}"
       data = @git.archive_tar_gz(params[:id], prefix + "/")      
       send_data(data, :type => 'application/x-gzip', 
         :filename => "#{prefix}.tar.gz") 
     else
       flash[:error] = I18n.t "trees_controller.archive_error"
-      redirect_to project_repository_path(@project, @repository) and return
+      redirect_to user_repository_path(@user, @repository) and return
     end
   end
 end
