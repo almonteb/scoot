@@ -18,18 +18,67 @@
 #++
 %>
 
-<% @page_title = "#{@user}'s #{@repository.name} - Gitorious" -%>
+<% @page_title = "#{@user.login}'s #{@repository.name}" -%>
 <h1><%= @repository.name %></h1>
-
 <% render_if_ready(@repository) do -%>
 
   <%= render :partial => "infobox" -%>
   
-  <%#= render_readme(@repository) %>
+  <%= render_readme(@repository) %>
+<% if current_user == @repository.user && !@repository.has_commits? %>
+<div id='setup_tips'>
+  <h2>Global Setup:</h2>
+    <pre>
+    Download and install Git
+    git config --global user.name "<%= @user.fullname %>"
+    git config --global user.email "<%= @user.email %>"
+    </pre>
+
+  <h2>Next steps:</h2>
+    <pre>
+    mkdir test
+    cd test
+    git init
+    touch README
+    git add README
+    git commit -m 'first commit'
+    git remote add origin git@github.com:radar/test.git
+    git push origin master</pre>
+
+  <h2>Existing Git Repo?</h2>
+    <pre>
+    cd existing_git_repo
+    git remote add origin git@github.com:radar/test.git
+    git push origin master
+    </pre>
+
+  <h2>Importing a SVN Repo?</h2>
+    <strong>Good luck, have fun.</strong>
+</div>
+<% else %>
+<table id='file_listing' width='100%'>
+  <thead>
+    <tr>
+      <td>name</td>
+      <td>age</td>
+      <td>message</td>
+    </tr>
+  </thead>
+  <tbody>
+    <% for blob in @repository.git.tree.contents %>
+      <tr>
+      <td><%= blob.name %></td>
+      <td><%= blob.mime_type if blob.respond_to?(:mime_type) %></td>
+      <td>sdfdsf</td>
+    <% end %>
+  </tbody>
+</table>
   
+<% end %>  
   <h2><%= t("views.repos.activities") %> <%= feed_icon @atom_auto_discovery_url %></h2>
   <%= render :partial => "events/events", :locals => { :events => @events } -%>
 <% end -%>
+
 
 <% content_for :submenu do -%>
   <%= render :partial => "context_menu" -%>
