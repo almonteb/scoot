@@ -48,7 +48,7 @@ class RepositoriesController < ApplicationController
       redirect_to project_repository_path(@project, @repository_to_clone)
       return
     end
-    @repository = Repository.new_by_cloning(@repository_to_clone, current_user.login)
+    @repository = Repository.new_by_cloning(@repository_to_clone, current_user)
   end
   
   def create_clone
@@ -67,7 +67,7 @@ class RepositoriesController < ApplicationController
       end
       return
     end
-    @repository = Repository.new_by_cloning(@repository_to_clone)
+    @repository = Repository.new_by_cloning(@repository_to_clone, current_user)
     @repository.name = params[:repository][:name]
     @repository.user = current_user
     

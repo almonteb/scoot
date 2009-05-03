@@ -1,5 +1,4 @@
-GitoriousConfig = YAML::load_file(File.join(Rails.root, 
-  ENV['RAILS_ENV'] == 'test' ? "config/gitorious.sample.yml" : "config/gitorious.yml"))
+GitoriousConfig = YAML::load_file(File.join(Rails.root, "config/gitorious.yml"))
 
 # make the default be publicly open
 GitoriousConfig['public_mode'] = true if GitoriousConfig['public_mode'].nil?

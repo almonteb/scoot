@@ -25,8 +25,8 @@
   <div id="regular_login_fields">
     <% # login_method %>
     <p>
-  <label for="login"><%= t("views.sessions.label").call(self) %></label><br/>
-    <%= text_field_tag 'email', params[:email], :class => "text" %>
+  <label for="email_or_login">Email or Login</label><br/>
+    <%= text_field_tag 'email_or_login', params[:email_or_login], :class => "text" %>
   </p>
 
   <p>

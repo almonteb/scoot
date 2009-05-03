@@ -63,7 +63,6 @@ module Gitorious
           raise BadCommandError
         end
         if ALLOW_RE =~ @argument
-          $stderr.puts "Calcu"
           @path = "/#{$1}"
           raise BadCommandError unless @path
         else

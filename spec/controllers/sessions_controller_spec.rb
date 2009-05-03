@@ -18,8 +18,6 @@
 #++
 
 require File.dirname(__FILE__) + '/../spec_helper'
-include OpenIdAuthentication
-
 describe SessionsController do
   
   def auth_token(token)

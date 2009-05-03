@@ -25,6 +25,7 @@ require "ostruct"
 describe Repository do
   before(:each) do
     @repository = new_repos
+    puts @repository.full_repository_path
     FileUtils.mkdir_p(@repository.full_repository_path, :mode => 0755)
   end
   

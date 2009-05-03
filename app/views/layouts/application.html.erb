@@ -66,6 +66,7 @@
       <%- if logged_in? -%>
         <li class="secondary">( <%= link_to t("views.layout.my_account"), account_path -%></li>
         <li class="secondary"><%= link_to t("views.layout.logout"), logout_path -%> )</li>
+        <li class="secondary">Logged in as <%= current_user.login %></li>
       <%- else -%>
 		<% if GitoriousConfig['public_mode'] -%>
         	<li class="secondary"><%= link_to "Register", new_user_path -%></li>
@@ -75,7 +76,7 @@
     </ul>
     
 	<% if GitoriousConfig['public_mode'] || logged_in? -%>
-    	<%= render :partial => "/searches/search_box" -%>
+
 	<% end -%>
     
     <% if @project -%>

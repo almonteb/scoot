@@ -24,12 +24,8 @@ module Gitorious
     class Client
       def initialize(strainer, username)
         @strainer = strainer
-        $stderr.puts "Dnsadfdsf"
         parts_of_path = strainer.path.split("/")
         @repository_name, @project_name, @user_name = [parts_of_path.last, parts_of_path.last.gsub(".git", ""), parts_of_path[-2]]
-        $stderr.puts @repository_name
-        $stderr.puts @project_name
-        $stderr.puts @user_name
         @repository_name.gsub!(/\.git$/, "")
       end
       attr_accessor :project_name, :repository_name, :user_name

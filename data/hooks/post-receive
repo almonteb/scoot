@@ -2,7 +2,6 @@
 
 incpath = File.dirname(__FILE__)
 $: << incpath
-$stderr.puts `which ruby`
 require 'rails_env'
 require 'date'
 
