@@ -22,7 +22,5 @@
           user_repository_logs_path(@user, @repository) -%></li>
 <li><%= link_to t("views.repos.tree"), 
           user_repository_trees_path(@user, @repository) -%></li>
-<li><%= link_to t("views.repos.comments", :count => @repository.comments.count), 
-          user_repository_comments_path(@user, @repository) -%></li>
 <li><%= link_to t("views.repos.requests", :count => @repository.merge_requests.count_open), 
           user_repository_merge_requests_path(@user, @repository) -%></li>

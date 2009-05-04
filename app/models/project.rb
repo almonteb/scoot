@@ -144,11 +144,6 @@ class Project < ActiveRecord::Base
     }
     super({:procs => [info]}.merge(opts))
   end
-  
-  def create_event(action_id, target, user, data = nil, body = nil, date = Time.now.utc)
-    events.create(:action => action_id, :target => target, :user => user,
-                  :body => body, :data => data, :created_at => date)
-  end
 
   protected
     def create_mainline_repository

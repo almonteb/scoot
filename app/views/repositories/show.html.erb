@@ -21,7 +21,9 @@
 <% @page_title = "#{@user.login}'s #{@repository.name}" -%>
 <h1><%= @repository.name %></h1>
 <% render_if_ready(@repository) do -%>
-
+<% if @repository.parent %>
+  <strong>Fork of <%= link_to "#{@repository.parent.user.login}/#{@repository.parent.name}", user_repository_path(@repository.parent.user, @repository.parent.name) %></strong>
+<% end %>
   <%= render :partial => "infobox" -%>
   
   <%= render_readme(@repository) %>
@@ -104,7 +106,6 @@
   <ul>
     <li><strong><%= t("views.logs.maintainer") %>:</strong> <%= link_to h(@repository.user.login), user_path(@repository.user) -%></li>
     <% if @repository.parent -%>
-    <li><strong><%= t("views.repos.clone_of") %>:</strong> <%= link_to "#{@repository.parent.user.login}/#{@repository.parent.name}", user_repository_path(@repository.parent.user, @repository.parent.name) -%>
     <% end -%>
     <li><strong><%= t("views.repos.created") %>:</strong> <%= @repository.created_at.to_s(:short) -%></li>
   </li>
@@ -114,11 +115,9 @@
       <li><%= link_to "Fork", clone_user_repository_path(@user, @repository) -%></li>
     <% end -%>
     <% if @repository.committers.include?(current_user) -%>
-      <li><%= link_to "Merge request", new_project_repository_merge_request_path(@user, @repository) -%></li>
+      <li><%= link_to "Merge request", new_user_repository_merge_request_path(@user, @repository) -%></li>
       <% if @repository.user == current_user -%>
-      <li><%= link_to t("views.repos.btn_add_committer"),
-              { :controller => "committers", :action => "new", :project_id => @project,
-                :repository_id => @repository } -%></li>
+      <li><%= link_to t("views.repos.btn_add_committer"), new_repository_committer_path(@repository) -%></li>
       <% end -%>
     <% end -%>
     <% if @repository.can_be_deleted_by?(current_user) -%>
@@ -147,7 +146,7 @@
   </ul>
 
   <% unless @repository.git.commits.blank? -%>
-    <h4><%= t("views.logs.branches") %>:</h4>
+    <h4><%= t("views.logs.branches") %></h4>
     <ul>
       <% @repository.git.branches.each do |branch| -%>
         <% if namespaced_branch?(branch.name) -%>

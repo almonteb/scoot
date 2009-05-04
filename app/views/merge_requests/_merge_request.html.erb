@@ -22,11 +22,7 @@
 <div class="merge_request_summary <%= merge_request.status_string -%>">
   <p class="status">[<span><%= merge_request.status_string -%></span>]</p>
   <h5>
-	<% source = link_to h(merge_request.source_name), 
-          [merge_request.source_repository.project, merge_request.source_repository] -%>
-	<% target = link_to h(merge_request.target_name), 
-	      [merge_request.source_repository.project, merge_request.target_repository] -%>
-	<%= t("views.merges.summary_title", :source => source, :target => target) -%>
+	<strong><%= merge_request.source_repository.user %></strong> has requested to merge <strong><%= merge_request.source_repository.user %>/<%= merge_request.source_repository %>:<%= merge_request.source_branch %></strong> with <strong><%= merge_request.target_repository.user %>/<%= merge_request.target_repository %>:<%= merge_request.target_branch %></strong>
   </h5>
   <div class="proposal"><%= sanitize(simple_format(merge_request.proposal)) -%></div>
   <p class="byline">
@@ -35,7 +31,7 @@
     <% if !no_link && merge_request.open? -%>
       | <strong>
           <%= link_to t("views.merges.review"), 
-                [merge_request.source_repository.project, 
+                [merge_request.source_repository.user, 
                   merge_request.target_repository, merge_request] -%>
         </strong>
     <% end -%>

@@ -35,7 +35,9 @@ ActionController::Routing::Routes.draw do |map|
     project_cat.formatted_projects_category "projects/category/:id.:format"
   end
   
-  map.resources :repositories
+  map.resources :repositories do |repo|
+    repo.resources :committers
+  end
   map.resources :projects, :member => {:confirm_delete => :get} do |projects|
     projects.resources :pages, :member => { :history => :get }
     projects.resources(:repositories, :member => {
@@ -93,7 +95,11 @@ ActionController::Routing::Routes.draw do |map|
   
   map.user_repository_commit ':user_id/:repository_id/commits/:id', :controller => "commits", :action => "show"
   map.user_repository_commit_comments ':user_id/:repository_id/commits/:commit_id/comments', :controller => "comments", :action => "index"
-  map.user_repository_merge_requests ':user_id/:repository_id/merge_requests', :controller => "merge_requests", :action => "index"
+
+  map.new_user_repository_merge_request ':user_id/:repository_id/merge_requests/new', :controller => "merge_requests", :action => "new"
+  map.user_repository_merge_requests ':user_id/:repository_id/merge_requests', :controller => "merge_requests", :action => "index", :conditions => { :method => :get }
+  map.user_repository_merge_requests ':user_id/:repository_id/merge_requests', :controller => "merge_requests", :action => "create", :conditions => { :method => :post }
+  map.user_repository_merge_request ':user_id/:repository_id/merge_requests/:id', :controller => "merge_requests", :action => "show"  
   
   map.clone_user_repository ':user_id/:id/clone', :controller => "repositories", :action => "clone"
   map.create_clone_user_repository ':user_id/:id/create_clone', :controller => "repositories", :action => "create_clone"

@@ -18,7 +18,6 @@
 
 class CommittersController < ApplicationController
   before_filter :login_required, :only => [:new, :create, :destroy, :list]
-  before_filter :find_project
   before_filter :find_repository, 
     :only => [:show, :new, :create, :edit, :update, :destroy, :list]
     
@@ -31,7 +30,7 @@ class CommittersController < ApplicationController
     unless @committer
       flash[:error] = I18n.t "committers_controller.create_error_not_found"
       respond_to do |format|
-        format.html { redirect_to(new_committer_url(@repository.project, @repository)) }
+        format.html { redirect_to(new_repository_committer_url(@repository)) }
         format.xml  { render :text => I18n.t( "committers_controller.create_error_not_found"), :status => :not_found }
       end
       return
@@ -40,14 +39,14 @@ class CommittersController < ApplicationController
     respond_to do |format|
       if @repository.add_committer(@committer)
         @committership = @repository.committerships.find_by_user_id(@committer.id)
-        @project.create_event(Action::ADD_COMMITTER, @committership, current_user)
-        format.html { redirect_to([@repository.project, @repository]) }
+        flash[:notice] = "#{@committer.fullname} (#{@committer.login}) has been added to the commiters list for this repository."
+        format.html { redirect_to([@repository.user, @repository]) }
         format.xml do 
           render :xml => @committer
         end
       else
         flash[:error] = I18n.t "committers_controller.create_error_already_commiter"
-        format.html { redirect_to(new_committer_url(@repository.project, @repository)) }
+        format.html { redirect_to(new_repository_committer_url(@repository)) }
         format.xml  { render :text => I18n.t("committers_controller.create_error_already_commiter"), :status => :not_found }
       end
     end
@@ -58,13 +57,12 @@ class CommittersController < ApplicationController
     
     respond_to do |format|
       if @committership.destroy
-        @project.create_event(Action::REMOVE_COMMITTER, @repository, current_user, params[:id])
         flash[:success] = I18n.t "committers_controller.destroy_success"
-        format.html { redirect_to [@repository.project, @repository] }
+        format.html { redirect_to [@repository.user, @repository] }
         format.xml  { render :nothing, :status => :ok }
       else
         flash[:error] = I18n.t "committers_controller.destroy_error≈"
-        format.html { redirect_to [@repository.project, @repository] }
+        format.html { redirect_to [@repository.user, @repository] }
         format.xml  { render :nothing, :status => :unprocessable_entity }
       end    
       
@@ -88,10 +86,7 @@ class CommittersController < ApplicationController
   
   private
     def find_repository
-      @repository = @project.repositories.find_by_name!(params[:repository_id])
-      unless @repository.user == current_user
-        flash[:error] = I18n.t "committers_controller.find_repository_error"
-        redirect_to [@repository.project, @repository]
-      end
+      @user = current_user
+      @repository = current_user.repositories.find_by_name!(params[:repository_id])
     end
 end

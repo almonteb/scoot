@@ -19,7 +19,6 @@
 
 class MergeRequestsController < ApplicationController
   before_filter :login_required, :except => [:index, :show]
-  before_filter :find_project
   before_filter :find_repository
   before_filter :find_merge_request, :except => [:index, :show, :new, :create]
   before_filter :assert_merge_request_ownership, :except => [:index, :show, :new, :create, :resolve]
@@ -42,7 +41,7 @@ class MergeRequestsController < ApplicationController
   
   def new
     @merge_request = @repository.proposed_merge_requests.new(:user => current_user)
-    @repositories = @project.repositories.find(:all, :conditions => ["id != ?", @repository.id])
+    @repositories = [@repository.parent]
   end
   
   def create
@@ -50,15 +49,15 @@ class MergeRequestsController < ApplicationController
     @merge_request.user = current_user
     respond_to do |format|
       if @merge_request.save
-        @project.create_event(Action::REQUEST_MERGE, @merge_request, current_user)
+        @repository.create_event(Action::REQUEST_MERGE, @merge_request, current_user)
         format.html {
           flash[:success] = I18n.t "merge_requests_controller.create_success", :name => @merge_request.target_repository.name
-          redirect_to project_repository_path(@project, @repository) and return
+          redirect_to user_repository_path(@user, @repository) and return
         }
         format.xml { render :xml => @merge_request, :status => :created }
       else
         format.html {
-          @repositories = @project.repositories.find(:all, :conditions => ["id != ?", @repository.id])
+          @repositories = [@repository.parent]
           render :action => "new"
         }
         format.xml { render :xml => @merge_request.errors, :status => :unprocessable_entity }
@@ -83,7 +82,6 @@ class MergeRequestsController < ApplicationController
   def update
     @merge_request.attributes = params[:merge_request]
     if @merge_request.save
-      @project.create_event(Action::UPDATE_MERGE_REQUEST, @merge_request, current_user)
       flash[:success] = I18n.t "merge_requests_controller.update_success"
       redirect_to [@project, @repository, @merge_request]
     else
@@ -94,14 +92,14 @@ class MergeRequestsController < ApplicationController
   
   def destroy
     @merge_request.destroy
-    @project.create_event(Action::DELETE_MERGE_REQUEST, @repository, current_user)
     flash[:success] = I18n.t "merge_requests_controller.destroy_success"
     redirect_to project_repository_path(@project, @repository)
   end
   
   protected
     def find_repository
-      @repository = @project.repositories.find_by_name!(params[:repository_id])
+      @user = User.find_by_permalink(params[:user_id])
+      @repository = @user.repositories.find_by_name!(params[:repository_id])
     end
     
     def find_merge_request

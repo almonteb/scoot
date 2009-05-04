@@ -36,7 +36,7 @@ class Repository < ActiveRecord::Base
   has_many    :proposed_merge_requests, :foreign_key => 'source_repository_id', 
                 :class_name => 'MergeRequest', :order => "id desc", :dependent => :destroy
   has_many    :cloners, :dependent => :destroy
-  has_many    :events, :as => :target, :dependent => :destroy
+  has_many    :events
   
   validates_presence_of :user_id, :name
   validates_format_of :name, :with => /^[a-z0-9_\-]+$/i,
@@ -47,6 +47,9 @@ class Repository < ActiveRecord::Base
   after_create :add_user_as_committer, :create_new_repos_task
   after_destroy :create_delete_repos_task
   
+  def to_s
+    name
+  end
   
   def self.new_by_cloning(other, user)
     suggested_name = other.name
@@ -83,6 +86,11 @@ class Repository < ActiveRecord::Base
   
   def self.delete_git_repository(path)
     git_backend.delete!(full_path_from_partial_path(path))
+  end
+  
+  def create_event(action_id, target, user, data = nil, body = nil, date = Time.now.utc)
+    events.create(:action => action_id, :target => target, :user => user,
+                  :body => body, :data => data, :created_at => date)
   end
   
   def gitdir

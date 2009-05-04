@@ -61,7 +61,6 @@ class CommentsController < ApplicationController
   private
   
   def find_object
-    puts params.inspect
     @object = @repository.git.commits(params[:commit_id]).first if params[:commit_id]
   end
 end

@@ -67,7 +67,7 @@ class RepositoriesController < ApplicationController
       redirect_to project_repository_path(@user, @repository_to_clone)
       return
     end
-    @repository = Project.new_by_cloning(@repository_to_clone, current_user).repositories.first
+    @repository = Repository.new_by_cloning(@repository_to_clone, current_user)
   end
   
   def create_clone

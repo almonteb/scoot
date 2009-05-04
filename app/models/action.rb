@@ -17,11 +17,10 @@
 #++
 
 class Action
-  CREATE_PROJECT = 0
-  DELETE_PROJECT = 1
-  UPDATE_PROJECT = 2
+  CREATE_REPOSITORY = 0
+  DELETE_REPOSITORY = 1
+  UPDATE_REPOSITORY = 2
   CLONE_REPOSITORY = 3
-  DELETE_REPOSITORY = 4
   COMMIT = 5
   CREATE_BRANCH = 6
   DELETE_BRANCH = 7
@@ -38,12 +37,6 @@ class Action
   
   def self.name(action_id)
     case action_id
-      when CREATE_PROJECT
-        "create project"
-      when DELETE_PROJECT
-        "delete project"
-      when UPDATE_PROJECT
-        "update project"
       when CLONE_REPOSITORY
         "clone repository"
       when DELETE_REPOSITORY

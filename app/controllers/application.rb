@@ -52,10 +52,6 @@ class ApplicationController < ActionController::Base
       end
     end
     
-    def find_project
-      @project = Project.find_by_slug!(params[:project_id])
-    end
-    
     def find_user
       @user = User.find_by_permalink(params[:user_id])
     end

@@ -21,7 +21,7 @@
 
 <%= error_messages_for :merge_request -%>
 
-<% form_for [@project, @repository, @merge_request] do |f| -%>
+<% form_for [@user, @repository, @merge_request] do |f| -%>
   <%= render :partial => "form", :locals => {:form => f} -%>
   
   <%= f.submit t("views.merges.create_btn") -%>

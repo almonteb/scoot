@@ -48,6 +48,10 @@ class User < ActiveRecord::Base
   before_save :encrypt_password
   before_create :make_activation_code
   before_create :make_permalink
+  
+  def to_s
+    login
+  end
 
 
   def self.find_by_login!(name)
