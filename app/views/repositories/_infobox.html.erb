@@ -38,7 +38,7 @@
   </li>
   <% if logged_in? && current_user.can_write_to?(@repository) -%>
     <li>
-      <strong><%= t("views.repos.push_url") %>:</strong> <code><%=h @repository.push_url -%></code>
+      <strong>Your clone URL:</strong> <code><%=h @repository.push_url -%></code>
       <small><%= link_to_function t("views.repos.more_info"), "$('detailed_push_info').toggle()" -%></small>
       <div id="detailed_push_info" class="info_hint" style="display:none">
 		<%= t("views.repos.help_push").call(@repository.push_url) %>

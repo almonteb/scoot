@@ -78,13 +78,13 @@
       touch README
       git add README
       git commit -m 'first commit'
-      git remote add origin git@github.com:radar/test.git
+      git remote add origin git@github.com:<%= @user.login %>/<%= @repository.name %>.git
       git push origin master</pre>
 
     <h2>Existing Git Repo?</h2>
       <pre>
       cd existing_git_repo
-      git remote add origin git@github.com:radar/test.git
+      git remote add origin git@github.com:<%= @user.login %>/<%= @repository.name %>.git
       git push origin master
       </pre>
 
@@ -162,7 +162,7 @@
     <h4>Forks:</h4>
     <ul>
       <% @repository.children.each do |children| -%>
-        <li><%= link_to h(children.name), user_repository_path(children.user, children) %></li>
+        <li><%= link_to "#{h(children.user)}/#{h(children.name)}", user_repository_path(children.user, children) %></li>
       <% end -%>
     </ul>
   <% end -%>
