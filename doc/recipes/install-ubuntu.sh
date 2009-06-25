@@ -9,7 +9,7 @@ export GITORIOUS_REPO=git://github.com/almonteb/scoot.git
 # DO NOT CHANGE THIS PART
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -q -y build-essential apache2 mysql-server mysql-client git git-svn apg geoip-bin libgeoip1 libgeoip-dev sqlite3 libsqlite3-dev imagemagick libpcre3 libpcre3-dev zlib1g zlib1g-dev libyaml-dev libmysqlclient15-dev sendmail libssl-dev 
+apt-get install -q -y build-essential apache2 mysql-server mysql-client git git-svn apg geoip-bin libgeoip1 libgeoip-dev sqlite3 libsqlite3-dev imagemagick libpcre3 libpcre3-dev zlib1g zlib1g-dev libyaml-dev libmysqlclient15-dev sendmail libssl-dev libapr1-dev apache2-prefork-dev
 
 # Checks for 64-bit flag
 while [ "$#" -gt "0" ]
@@ -117,6 +117,7 @@ rm /etc/apache2/sites-enabled/000*
 ln -s /etc/apache2/sites-available/gitorious /etc/apache2/sites-enabled/000-gitorious
 
 gem install mime-types oniguruma textpow chronic BlueCloth ruby-yadis ruby-openid rmagick geoip ultrasphinx rspec rspec-rails RedCloth echoe daemons geoip --no-rdoc --no-ri
+gem install -v=2.2.2 rails
 
 cd /var/www
 test -d gitorious || git clone $GITORIOUS_REPO gitorious
