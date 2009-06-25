@@ -116,6 +116,8 @@ echo "</VirtualHost>" >> /etc/apache2/sites-available/gitorious
 rm /etc/apache2/sites-enabled/000*
 ln -s /etc/apache2/sites-available/gitorious /etc/apache2/sites-enabled/000-gitorious
 
+apt-get -q -y install librmagick-ruby libmagick*-dev
+
 gem install mime-types oniguruma textpow chronic BlueCloth ruby-yadis ruby-openid rmagick geoip ultrasphinx rspec rspec-rails RedCloth echoe daemons geoip --no-rdoc --no-ri
 gem install -v=2.2.2 rails
 
