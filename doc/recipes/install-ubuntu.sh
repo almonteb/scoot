@@ -3,13 +3,13 @@
 
 # ONLY CHANGE THIS PART
 export SERVER_NAME=gitorious.org
-export GITORIOUS_REPO=git://gitorious.org/gitorious/akitaonrails-gitorious.git
+export GITORIOUS_REPO=git://github.com/almonteb/scoot.git
 
 
 # DO NOT CHANGE THIS PART
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -q -y build-essential apache2 mysql-server mysql-client git git-svn apg geoip-bin libgeoip1 libgeoip-dev sqlite3 libsqlite3-dev imagemagick libpcre3 libpcre3-dev zlib1g zlib1g-dev libyaml-dev libmysqlclient15-dev apache2-dev sendmail
+apt-get install -q -y build-essential apache2 mysql-server mysql-client git git-svn apg geoip-bin libgeoip1 libgeoip-dev sqlite3 libsqlite3-dev imagemagick libpcre3 libpcre3-dev zlib1g zlib1g-dev libyaml-dev libmysqlclient15-dev sendmail
 
 # Checks for 64-bit flag
 while [ "$#" -gt "0" ]
